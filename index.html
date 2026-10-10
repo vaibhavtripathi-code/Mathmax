@@ -78,6 +78,12 @@ sup{font-size:.55em;line-height:0}
 button.fld{border-radius:999px}
 #auth .lk{display:flex;justify-content:space-between;gap:12px;font-size:.88rem;margin-top:1.2rem}
 
+
+
+
+
+
+
 ::selection{background:var(--ac);color:#000}
 button,.go{transition:border-color .15s,background .15s,opacity .15s,transform .1s}
 button:active,.go:active{transform:scale(.97)}
@@ -100,6 +106,14 @@ input.go{background:var(--ac);color:#000;border:0;border-radius:16px;font-size:1
 .save input.w{min-width:0}
 .pn:has(table){overflow-x:auto}
 td:first-child,th:first-child{white-space:nowrap}
+
+
+
+
+
+
+
+
 
 #game{position:relative;display:flex;align-items:center;justify-content:center;height:100vh;height:100dvh;padding:0 20px}
 .gm{width:min(260px,100%)}
@@ -125,9 +139,9 @@ td:first-child,th:first-child{white-space:nowrap}
 .t:has(.ck:checked) .sb{color:var(--mu)}
 .t:has(.ck:checked) input[type=text],.t:has(.ck:checked) select{background:#000;border-color:#2c2c2c;color:var(--ac)}
 .t:has(.ck:checked) select{color:var(--fg)}
-.t:has(.ck:checked) input[type=text]:focus{outline-color:#000}
+.t:has(.ck:checked) input[type=text]:focus{outline-color:var(--ac)}
 .t:has(.ck:checked)::after{background:var(--ac);border-color:var(--ac)}
-.t:has(.ck:focus-visible){outline-color:#000}
+.t:has(.ck:focus-visible){outline-color:var(--ac)}
 .k,.pb,.pn{background:transparent;border:0;border-radius:0}
 .k{padding:0}
 .lt{gap:20px 12px;margin-bottom:28px}
@@ -156,7 +170,7 @@ dialog::backdrop{background:rgba(0,0,0,.72)}
 #wk{margin:-12px 0 24px;align-self:flex-start;color:var(--ac)}
 #pu{margin-top:8px;align-self:flex-start;color:var(--ac)}
 button.x{border:0;padding:2px 6px;color:var(--mu)}button.x:hover{color:#ff7b7b}
-#pbl{color:var(--ac)}#rv{line-height:1.7;margin-top:12px}
+#end #pbl{color:var(--ac)}#rv{line-height:1.7;margin-top:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 [hidden]{display:none!important}
 @media(max-width:900px){.app{grid-template-columns:1fr;height:auto}#pl{overflow:visible}.s6{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -195,15 +209,6 @@ button.x{border:0;padding:2px 6px;color:var(--mu)}button.x:hover{color:#ff7b7b}
 <p class="m">This permanently deletes every drill, stack and stat, on this device and in your account. Your sign-in and name stay. It cannot be undone.</p>
 <p class="m">Type <b>delete</b> to confirm.</p><input type="text" id="rc" class="fld" autocomplete="off" aria-label="Type delete to confirm">
 <div class="bt"><button type="button" id="rn">Cancel</button><button type="button" id="ry" class="dng" disabled>Delete everything</button></div></div></dialog>
-
-<dialog id="verifdlg">
-  <div class="di" style="text-align: center; padding: 30px 24px;">
-    <h2>Check your email</h2>
-    <p class="m" id="verifmsg" style="margin: 12px 0 20px;"></p>
-    <button type="button" class="pri" id="verif-ok">Got it</button>
-  </div>
-</dialog>
-
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),K='zt3';
@@ -280,34 +285,15 @@ function auth(mode,msg){const e=$('em');if(e&&e.value)rmail=e.value.trim();amode
  const btn={in:'Sign in',up:'Create account',fg:'Send code',rs:'Reset password'}[mode];
  const lk={in:'<a href="#" data-m="fg">Forgot password?</a><a href="#" data-m="up">Create an account</a>',up:'<a href="#" data-m="in">I already have an account</a>',fg:'<a href="#" data-m="in">Back to sign in</a>',rs:'<a href="#" data-m="fg">Send a new code</a><a href="#" data-m="in">Back to sign in</a>'}[mode];
  $('auth').innerHTML=`<span class="wm">Mathmax</span><h1>${T[0]}</h1><p class="m">${T[1]}</p><form id="af">${body}<button class="pri fld" type="submit">${btn}</button></form><p class="lk">${lk}</p><p class="m" id="am">${esc(msg||'')}</p>`}
-$('auth').onclick=e=>{const m=e.target.dataset.m;if(m){e.preventDefault();auth(m)}};$('auth').onsubmit=async e=>{e.preventDefault();const g=id=>$(id)?$(id).value.trim():'',mode=amode;
+$('auth').onclick=e=>{const m=e.target.dataset.m;if(m){e.preventDefault();auth(m)}};
+$('auth').onsubmit=async e=>{e.preventDefault();const g=id=>$(id)?$(id).value.trim():'',mode=amode;
  try{amsg('Working…');
   if(mode==='in'){rmail=g('em');const{error}=await sb.auth.signInWithPassword({email:rmail,password:$('apw').value});if(error)throw error}
-  else if(mode==='up'){
-    rmail=g('em');
-    const{data,error}=await sb.auth.signUp({
-      email: rmail,
-      password: $('apw').value,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: g('nm') ? { name: g('nm') } : {}
-      }
-    });
-    if(error) throw error;
-    if(!data.session){
-      $('verifmsg').textContent = 'Account created successfully! We sent a verification link to ' + rmail + '. Please check your inbox and click the link to sign in.';
-      $('verifdlg').showModal();
-    }
-  }
+  else if(mode==='up'){rmail=g('em');const{data,error}=await sb.auth.signUp({email:rmail,password:$('apw').value,options:{data:g('nm')?{name:g('nm')}:{}}});if(error)throw error;if(!data.session)auth('in','Account created. Confirm the email we sent you, then sign in.')}
   else if(mode==='fg'){rmail=g('em');const{error}=await sb.auth.resetPasswordForEmail(rmail);if(error)throw error;auth('rs','Code sent. It can take a minute to arrive.')}
   else{rec=1;const{error}=await sb.auth.verifyOtp({email:rmail,token:g('cd'),type:'recovery'});if(error)throw error;
    const r=await sb.auth.updateUser({password:$('apw').value});if(r.error)throw r.error;rec=0;show('home')}
  }catch(err){rec=0;if(user&&mode==='rs'){show('home');alert('You are signed in, but the password was not changed: '+err.message)}else amsg(err.message)}};
-
-$('verif-ok').onclick = () => {$('verifdlg').close();
-  auth('in');
-};
-
 $('so').onclick=async()=>{if(!sb||!confirm('Signing out clears your progress from this browser. It stays safe in your account.'))return;
  try{clearTimeout(pt);await sync();await sb.auth.signOut();S=Object.assign(fresh(),{rev:S.rev});save(true)}
  catch(err){alert('Could not sync before signing out, so you are still signed in. '+err.message)}};
@@ -357,19 +343,20 @@ function np(s){const o=[];OPK.forEach((k,i)=>{if(s[k])o.push(i)});const op=o[rn(
 
 /* ---- the drill ---- */
 let G=null,cur=-1;const an=$('an');
-function show(id){view=id;['auth','home','game','ins'].forEach(x=>{$(x).hidden=x!==id});$('bar').hidden=!(id==='home'||id==='ins');$('so').hidden=!sb;if(id==='auth'&&!$('auth').innerHTML)auth('in');if(id==='home')draw()}
+function show(id){view=id;['auth','home','game','ins'].forEach(x=>{$(x).hidden=x!==id});
+ $('bar').hidden=!(id==='home'||id==='ins');$('so').hidden=!sb;if(id==='auth'&&!$('auth').innerHTML)auth('in');if(id==='home')draw()}
 function nx(first){const c=G.cur=np(G.s);$('pr').innerHTML=c.l!==undefined?`<div class="r">${c.u}</div><div class="r"><span class="o">${c.o}</span>${c.l}</div>`:`<div class="r">${c.t}</div>`;$('lv').textContent=qtext(c);an.value='';if(!first)G.qt=Date.now()}
 function start(s){if(G){clearInterval(G.tm);clearInterval(G.cdt)}const q=/^q/.test(s.d);
  G={s,q,n:parseInt(String(s.d).replace('q',''),10),sc:0,mi:0,go:0,over:0,tm:0,cdt:0,qs:[],wr:[],cur:null,t0:0,qt:0};
  show('game');$('game').classList.toggle('q',q);$('pa').hidden=false;$('end').hidden=true;an.disabled=false;an.value='';
  $('lf').textContent=q?'Questions left: '+G.n:G.n+'s';$('gs').textContent=q?'0s':'Score: 0';
- let c=3;$('pr').innerHTML='<div class="r">3</div>';an.focus();
+ let c=3;$('eh').textContent='Quit (Esc)';$('pr').innerHTML='<div class="r">3</div>';an.focus();
  G.cdt=setInterval(()=>{c--;if(c>0){$('pr').innerHTML='<div class="r">'+c+'</div>';return}
   clearInterval(G.cdt);G.go=1;nx(true);G.t0=G.qt=Date.now();G.tm=setInterval(tick,100);an.focus()},800)}
 an.oninput=()=>{if(!G||G.over)return;if(!G.go){an.value='';return}const now=Date.now();
  const v=an.value.trim().replace(',','.'),a=G.cur.a;
  if(/^\d*\.?\d+$/.test(v)&&+v===a){G.sc++;G.qs.push([G.cur.op,Math.round((now-G.qt)/100)]);
-  if(G.q){$('lf').textContent='Questions left: '+(G.n-G.sc);if(G.sc>=G.n){end();return}}else$('gs').textContent='Score: '+G.sc;
+  if(G.q){$('lf').textContent='Questions left: '+(G.n-G.sc);if(G.sc>=G.n){end();return}}else $('gs').textContent='Score: '+G.sc;
   nx()}
  else if(v.length>=String(a).length){G.mi++;if(!G.cur.w){G.cur.w=1;G.wr.push(plain(G.cur))}an.value='';const pa=$('pa');pa.classList.add('bad');setTimeout(()=>pa.classList.remove('bad'),250)}};
 function tick(){const e=(Date.now()-G.t0)/1000;
@@ -385,13 +372,15 @@ function end(){clearInterval(G.tm);G.over=1;an.disabled=true;
  $('es').textContent=G.q?'Time: '+fmt(el):'Score: '+G.sc;
  const tq=G.qs.length?G.qs.reduce((a,x)=>a+x[1],0)/G.qs.length/10:null,w=G.wr;
  $('ex').textContent='Average per question '+fmt(tq)+', accuracy '+(tot?pc(G.sc/tot):'-');
- $('pbl').textContent=pbt;
+ $('pbl').textContent=pbt;$('eh').textContent='Back (Esc)';
  $('rv').innerHTML=w.length?'<span class="m">Missed</span><br>'+w.slice(0,6).map(esc).join('<br>')+(w.length>6?'<br>and '+(w.length-6)+' more':''):''}
 $('ta').onclick=e=>{e.preventDefault();start(G.s)};
-$('cs').onclick=e=>{e.preventDefault();show('home')};$('f').onsubmit=e=>{e.preventDefault();const s=rd();wr(s);start(s)};
+$('cs').onclick=e=>{e.preventDefault();show('home')};
+$('f').onsubmit=e=>{e.preventDefault();const s=rd();wr(s);start(s)};
 let qa=0;
 function quit(){const g=G;if(g&&g.go&&!g.over&&Date.now()-qa>2500){qa=Date.now();$('eh').textContent='Press again to quit';setTimeout(()=>{$('eh').textContent='Quit (Esc)'},2500);an.focus();return}
- if(g){clearInterval(g.tm);clearInterval(g.cdt);g.over=1}$('eh').textContent='Quit (Esc)';show('home')}$('eh').onclick=quit;
+ if(g){clearInterval(g.tm);clearInterval(g.cdt);g.over=1}$('eh').textContent='Quit (Esc)';show('home')}
+$('eh').onclick=quit;
 $('game').onclick=e=>{if(G&&!G.over&&e.target.id!=='eh')an.focus()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&view==='game')quit()});
 
@@ -419,13 +408,15 @@ function draw(){const o=S.presets.map((p,i)=>i).sort((a,b)=>used(S.presets[b])-u
  $('al').innerHTML=o.map(i=>card(S.presets[i],i)).join('');
  const st=stats(S.sessions);
  WK=st?st.o.map((x,i)=>[x,i]).filter(x=>x[0]!=null&&st.oc[x[1]]>=5).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]):[];$('wk').hidden=WK.length<2;
- $('sum').innerHTML=kt(life(S.sessions))}$('wk').onclick=()=>{if(WK.length<2)return;const s=rd();OPK.forEach(k=>{s[k]=0});WK.forEach(i=>{s[OPK[i]]=1});start(s)};
+ $('sum').innerHTML=kt(life(S.sessions))}
+$('wk').onclick=()=>{if(WK.length<2)return;const s=rd();OPK.forEach(k=>{s[k]=0});WK.forEach(i=>{s[OPK[i]]=1});start(s)};
 $('ps').onclick=()=>{const n=$('pn').value.trim();if(!n){pm('Give the stack a name first.');return}
  if(S.presets.some(p=>p.name===n)){pm('A stack named "'+n+'" already exists. Pick another name.');return}
  const s=rd(),m=match(s);if(m){pm('These settings are already saved as "'+m+'".');return}
  S.presets.push({name:n,s,c:Date.now()});save();$('pn').value='';pm('Stack "'+n+'" saved.');ld=n;upd();draw()};
 function upd(){const p=S.presets.find(x=>x.name===ld);$('pu').hidden=!(p&&sig(p.s)!==sig(rd()));if(p)$('pu').textContent='Update "'+p.name+'" with these settings'}
-$('f').addEventListener('input',upd);$('f').addEventListener('change',upd);$('pu').onclick=()=>{const p=S.presets.find(x=>x.name===ld);if(!p)return;const s=rd(),m=match(s);if(m&&m!==p.name){pm('These settings are already saved as "'+m+'".');return}
+$('f').addEventListener('input',upd);$('f').addEventListener('change',upd);
+$('pu').onclick=()=>{const p=S.presets.find(x=>x.name===ld);if(!p)return;const s=rd(),m=match(s);if(m&&m!==p.name){pm('These settings are already saved as "'+m+'".');return}
  p.s=s;p.c=Date.now();save();pm('Stack "'+p.name+'" updated.');upd();draw()};
 function act(a,i){const p=S.presets[i];if(!p)return;
  if(a==='ins'){cur=i;ins()}
@@ -433,12 +424,14 @@ function act(a,i){const p=S.presets[i];if(!p)return;
  else if(a==='prac'){wr(p.s);ld=p.name;upd();start(Object.assign({},DEF,p.s))}}
 const clk=e=>{const t=e.target;if(t.id==='sa'){$('dlg').showModal();return}if(t.dataset.i==null)return;e.preventDefault();if($('dlg').open)$('dlg').close();act(t.dataset.a,+t.dataset.i)};
 $('pl').onclick=clk;$('al').onclick=clk;
-$('dx').onclick=()=>$('dlg').close();$('dlg').onclick=e=>{if(e.target===$('dlg'))$('dlg').close()};
+$('dx').onclick=()=>$('dlg').close();
+$('dlg').onclick=e=>{if(e.target===$('dlg'))$('dlg').close()};
 
 $('exp').onclick=e=>{e.preventDefault();const b=new Blob([JSON.stringify({exported:new Date().toISOString(),stacks:S.presets,drills:S.sessions},null,1)],{type:'application/json'});
  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mathmax-data.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 /* ---- reset account data ---- */
-$('rst').onclick=e=>{e.preventDefault();$('rc').value='';$('ry').disabled=true;$('rdlg').showModal();$('rc').focus()};$('rc').oninput=()=>{$('ry').disabled=$('rc').value.trim().toLowerCase()!=='delete'};
+$('rst').onclick=e=>{e.preventDefault();$('rc').value='';$('ry').disabled=true;$('rdlg').showModal();$('rc').focus()};
+$('rc').oninput=()=>{$('ry').disabled=$('rc').value.trim().toLowerCase()!=='delete'};
 $('rn').onclick=()=>$('rdlg').close();
 $('ry').onclick=async()=>{$('rdlg').close();clearTimeout(pt);
  S=Object.assign(fresh(),{rev:S.rev,owner:S.owner,reset:Date.now()});save(true);pm('');draw();
@@ -464,10 +457,13 @@ function ins(){const p=S.presets[cur];if(!p){show('home');return}
   if(ov.length>1)o+=`<p class="m">Weak point: ${OPL[a.o.indexOf(mx)].toLowerCase()}. Max it out.</p>`}
  h+=`<div class="two"><div class="pn"><h2>Speed over time</h2>${c}</div><div class="pn"><h2>By operation</h2>${o}</div></div>`;
  h+='<div class="pn" style="margin-top:10px"><h2>Recent drills</h2><table><tr><th>Date</th><th>Score</th><th>Time</th><th>Accuracy</th><th>Per question</th><th></th></tr>'+L.slice(-10).reverse().map(r=>`<tr><td>${new Date(r.t).toLocaleString([],{dateStyle:'short',timeStyle:'short'})}</td><td>${r.sc}</td><td>${fmt(r.el)}</td><td>${r.sc+r.mi?pc(r.sc/(r.sc+r.mi)):'-'}</td><td>${fmt(sq(r))}</td><td><button type="button" class="x" data-del="${r.id}">Delete</button></td></tr>`).join('')+'</table></div>';
- $('ib').innerHTML=h}$('ib').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;const id=+b.dataset.del;
+ $('ib').innerHTML=h}
+$('ib').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;const id=+b.dataset.del;
  if(!confirm('Delete this drill from your history?'))return;S.dels.push(id);S.sessions=S.sessions.filter(r=>r.id!==id);save();ins()};
-$('bk2').onclick=e=>{e.preventDefault();show('home')};$('ip').onclick=()=>act('prac',cur);
-$('il').onclick=()=>{act('load',cur);show('home')};$('idl').onclick=()=>{const p=S.presets[cur];if(p&&confirm('Delete stack "'+p.name+'"? Your drill history is kept.')){S.gone[p.name]=Date.now();S.presets.splice(cur,1);save();show('home')}};
+$('bk2').onclick=e=>{e.preventDefault();show('home')};
+$('ip').onclick=()=>act('prac',cur);
+$('il').onclick=()=>{act('load',cur);show('home')};
+$('idl').onclick=()=>{const p=S.presets[cur];if(p&&confirm('Delete stack "'+p.name+'"? Your drill history is kept.')){S.gone[p.name]=Date.now();S.presets.splice(cur,1);save();show('home')}};
 
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 boot();
