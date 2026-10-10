@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathmax</title>
+<meta name="description" content="Mathmax is a fast mental-math drill with saved stacks, personal bests and progress that syncs across your devices.">
+<meta name="theme-color" content="#000000"><meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Mathmax"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta property="og:title" content="Mathmax"><meta property="og:description" content="Fast mental-math drills with progress that syncs everywhere."><meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23000%27/%3E%3Ctext%20x%3D%2732%27%20y%3D%2747%27%20font-size%3D%2742%27%20font-weight%3D%27800%27%20text-anchor%3D%27middle%27%20fill%3D%27%238ecbff%27%20font-family%3D%27system-ui%2CSegoe%20UI%2CArial%2Csans-serif%27%3EM%3C/text%3E%3C/svg%3E" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png"><link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{color-scheme:dark;--bg:#000;--sf:#0c0c0c;--ln:#222;--fg:#f2f6fa;--mu:#7f8b96;--ac:#8ecbff;--f:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--f);font-variant-numeric:tabular-nums}
+#bar{display:flex;align-items:center;gap:14px;height:76px;max-width:1180px;margin:0 auto;padding:0 28px}
+.wm{font-weight:800;font-size:2rem;letter-spacing:-.035em;margin-right:auto}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:0}
+h2{font-size:.85rem;font-weight:500;color:var(--mu);margin:0 0 8px}
+p{margin:.4rem 0}.m{color:var(--mu);font-size:.85rem}
+a{color:var(--ac)}
+button,input[type=submit]{font:inherit;font-size:.85rem;padding:6px 13px;border:1px solid #2c2c2c;border-radius:999px;background:transparent;color:var(--fg);cursor:pointer}
+button:hover{border-color:var(--mu)}
+.pri{background:var(--ac);color:#000;border-color:var(--ac);font-weight:600}
+.pri:hover{border-color:var(--ac);opacity:.85}
+input[type=text],input[type=email],input[type=password],select{font:inherit;font-size:.9rem;border:1px solid #2c2c2c;border-radius:9px;padding:6px 10px;background:#000;color:var(--fg)}
+input.w{flex:1;min-width:0}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:32px;max-width:1180px;margin:0 auto;padding:6px 28px 24px;height:calc(100vh - 76px);height:calc(100dvh - 76px)}
+.hd{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.t{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:96px;padding:13px 15px;border:1px solid var(--ln);border-radius:16px;background:var(--sf);cursor:pointer;transition:background .15s,border-color .15s}
+.t b{font-weight:600}
+.sb{font-size:.78rem;color:var(--mu);display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.sb i{font-style:normal}
+.t:hover{border-color:#3a3a3a}
+.t:has(.ck:checked){background:var(--ac);border-color:var(--ac);color:#000}
+.t:has(.ck:checked) .sb{color:rgba(0,0,0,.62)}
+.t:has(.ck:focus-visible){outline:2px solid #fff;outline-offset:2px}
+.ck{position:absolute;opacity:0;pointer-events:none}
+.t input[type=text]{width:2.7em;padding:3px 0;text-align:center;font-size:.8rem;border-radius:7px;color:var(--ac)}
+.t:has(.ck:checked) input[type=text]{background:rgba(0,0,0,.14);border-color:transparent;color:#000}
+.t select{padding:4px 8px;font-size:.85rem}
+.s2{grid-column:span 2}
+.go{grid-column:span 2;font-size:1.1rem;font-weight:700;background:var(--ac);color:#000;border:0;border-radius:16px;min-height:96px}
+.go:hover{opacity:.85}
+
+.right{display:flex;flex-direction:column;min-height:0}
+.lt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.k,.pb,.pn{background:var(--sf);border:1px solid var(--ln);border-radius:16px}
+.k{padding:11px 14px}.k b{display:block;font-size:1.35rem;font-weight:600;letter-spacing:-.01em}.k span{font-size:.75rem;color:var(--mu)}
+.save{display:flex;gap:8px}
+#pl{flex:1;min-height:0;overflow:auto;margin-top:6px;padding-right:2px}
+.pb{padding:14px 16px;margin-bottom:10px}
+.pb:hover{border-color:#3a3a3a}
+.nm{color:var(--fg);font-weight:600;text-decoration:none}.nm:hover{text-decoration:underline}
+.ds{color:var(--mu);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 12px}
+.mn b{display:block;font-weight:600;font-size:1rem}.mn span{font-size:.68rem;color:var(--mu)}
+.bt{display:flex;gap:6px;flex-wrap:wrap}
+
+.pg{max-width:1000px;margin:0 auto;padding:6px 28px 40px}
+.ih{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}.ih h1{margin-right:auto}
+.s6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.two{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;margin-top:10px}
+.pn{padding:14px 16px}.pn h2{margin-bottom:10px}
+.bo{max-height:200px;overflow:auto}.br{margin:.3rem 0;font-size:.88rem}
+.bar{background:var(--ac);height:8px;border-radius:4px;display:inline-block;vertical-align:middle;margin:0 10px}
+.ol{display:inline-block;width:9em}
+table{border-collapse:collapse;width:100%;font-size:.88rem}th{font-weight:500;color:var(--mu);text-align:left}td,th{padding:6px 8px 6px 0;border-bottom:1px solid var(--ln)}
+sup{font-size:.55em;line-height:0}
+
+#auth{max-width:400px;margin:0 auto;padding:12vh 24px 40px}
+#auth .wm{display:block;margin-bottom:2rem;font-size:2.6rem}
+#auth h1{font-size:1.6rem}
+#auth form{margin-top:1.4rem}
+.fld{display:block;width:100%;margin:0 0 10px;padding:12px 14px;font-size:1rem;border-radius:12px}
+button.fld{border-radius:999px}
+#auth .lk{display:flex;justify-content:space-between;gap:12px;font-size:.88rem;margin-top:1.2rem}
+
+
+
+
+
+
+
+::selection{background:var(--ac);color:#000}
+button,.go{transition:border-color .15s,background .15s,opacity .15s,transform .1s}
+button:active,.go:active{transform:scale(.97)}
+h2{font-weight:600;letter-spacing:.01em}
+.hd{margin-bottom:18px}.hd .m{font-size:.9rem}
+.t::after{content:"";position:absolute;top:13px;right:13px;width:9px;height:9px;border-radius:50%;border:1.5px solid #3a3a3a;transition:background .15s,border-color .15s}
+.t:has(.ck:checked)::after{background:#000;border-color:#000}
+.t:not(:has(.ck))::after{display:none}
+.t:not(:has(.ck:checked)) b{color:#c7d0d8}
+.t b{font-size:.95rem;padding-right:16px}
+input.go{background:var(--ac);color:#000;border:0;border-radius:16px;font-size:1.1rem;font-weight:700}
+.t input[type=text]:focus{border-color:var(--ac)}
+.t:has(.ck:checked) input[type=text]:focus{outline-color:#000}
+.t:has(.ck:checked) select{background:rgba(0,0,0,.14);border-color:transparent;color:#000}
+.pb{display:flex;flex-direction:column;gap:2px}
+.ds{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;margin-top:2px}
+.mn{margin:12px 0;padding:10px 0;border-block:1px solid var(--ln)}
+.pb .bt{margin-top:2px}
+#pl{scrollbar-width:thin;scrollbar-color:#2a2a2a transparent}
+.save input.w{min-width:0}
+.pn:has(table){overflow-x:auto}
+td:first-child,th:first-child{white-space:nowrap}
+
+
+
+
+
+
+
+
+
+#game{position:relative;display:flex;align-items:center;justify-content:center;height:100vh;height:100dvh;padding:0 20px}
+.gm{width:min(260px,100%)}
+#pr{display:grid;justify-items:end;padding-bottom:10px;border-bottom:2px solid var(--ln);font-size:2rem;font-weight:600;line-height:1.25;letter-spacing:-.01em;transition:border-color .15s}
+#pr .r{display:flex;gap:.6em}#pr .o{color:var(--mu);font-weight:400}
+#pa.bad #pr{border-bottom-color:#ff7b7b}
+#an{display:block;width:100%;padding:10px 0 0;border:0;outline:0;border-radius:0;background:transparent;color:var(--ac);caret-color:var(--ac);font:inherit;font-size:2rem;font-weight:600;text-align:right}
+#end{text-align:center}#end p{margin:.4rem 0}
+#es{font-size:2.4rem;font-weight:600;letter-spacing:-.02em}
+#end .sm{color:var(--mu);font-size:.9rem}#end .sm a{text-underline-offset:3px}
+#eh{position:absolute;bottom:18px;left:0;right:0;margin:0 auto;width:max-content;padding:8px 14px;border:0;color:var(--mu);font-size:.85rem}
+#who{color:var(--fg);font-size:.9rem}
+.gh{position:absolute;top:22px;left:28px;right:28px;display:flex;justify-content:space-between;align-items:baseline;font-size:.85rem;color:var(--mu)}
+#game:not(.q) .gh{flex-direction:row-reverse}
+#game:not(.q) #lf,#game.q #gs{color:var(--fg);font-size:1.25rem;font-weight:600}
+#who{padding:2px 4px;border:0;border-radius:6px;color:var(--fg);font-size:.9rem}
+#who:not(:disabled)::after{content:"\270E";margin-left:7px;color:var(--mu)}
+#who:not(:disabled):hover{text-decoration:underline;text-underline-offset:3px}
+#who:disabled{color:var(--mu);cursor:default}
+.t{background:transparent;border-radius:14px}
+.t:hover{border-color:#3a3a3a}
+.t:has(.ck:checked){background:rgba(142,203,255,.07);border-color:var(--ac);color:var(--fg)}
+.t:has(.ck:checked) .sb{color:var(--mu)}
+.t:has(.ck:checked) input[type=text],.t:has(.ck:checked) select{background:#000;border-color:#2c2c2c;color:var(--ac)}
+.t:has(.ck:checked) select{color:var(--fg)}
+.t:has(.ck:checked) input[type=text]:focus{outline-color:var(--ac)}
+.t:has(.ck:checked)::after{background:var(--ac);border-color:var(--ac)}
+.t:has(.ck:focus-visible){outline-color:var(--ac)}
+.k,.pb,.pn{background:transparent;border:0;border-radius:0}
+.k{padding:0}
+.lt{gap:20px 12px;margin-bottom:28px}
+.pb,.pn{border-top:1px solid var(--ln);padding:16px 0;margin:0}
+.pb:hover{border-color:var(--ln)}
+.mn{margin:10px 0 12px;padding:0;border:0}
+.mn span,.k span{display:block;line-height:1.3}
+#pl{flex:none;overflow:visible;margin-top:12px;padding:0}
+.app{height:auto;min-height:calc(100vh - 76px);padding-bottom:48px}
+button.more{display:block;width:100%;margin-top:4px;padding:12px 0 0;border:0;border-top:1px solid var(--ln);border-radius:0;color:var(--ac);text-align:left}
+button.more:hover{text-decoration:underline;text-underline-offset:3px}
+.right #rf{display:flex;gap:20px;margin:auto 0 0;padding-top:32px}
+#rst{color:var(--mu);font-size:.8rem}
+dialog{width:min(560px,92vw);max-height:82vh;padding:0;border:1px solid var(--ln);border-radius:16px;background:var(--bg);color:var(--fg)}
+dialog::backdrop{background:rgba(0,0,0,.72)}
+.di{max-height:82vh;overflow:auto;padding:20px 24px}
+.di h2{margin:0;font-size:1.05rem;color:var(--fg)}
+.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+#al .pb:first-child{border-top:0}
+#rdlg .di>*+*{margin-top:12px}
+.dng{border-color:#ff7b7b;color:#ff7b7b}
+.dng:not(:disabled):hover{background:#ff7b7b;color:#000;border-color:#ff7b7b}
+.dng:disabled{opacity:.35;cursor:not-allowed}
+#exp{color:var(--mu);font-size:.8rem}
+#sy.bad{color:#ff7b7b}
+#wk{margin:-12px 0 24px;align-self:flex-start;color:var(--ac)}
+#pu{margin-top:8px;align-self:flex-start;color:var(--ac)}
+button.x{border:0;padding:2px 6px;color:var(--mu)}button.x:hover{color:#ff7b7b}
+#pbl{color:var(--ac)}#rv{line-height:1.7;margin-top:12px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none!important}
+@media(max-width:900px){.app{grid-template-columns:1fr;height:auto}#pl{overflow:visible}.s6{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#bar,.app,.pg{padding-left:16px;padding-right:16px}.app{gap:24px}.hd{flex-wrap:wrap;gap:4px 12px}.mn,.s6{grid-template-columns:repeat(2,1fr)}.go{min-height:72px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:600px){#bar{height:64px}.wm{font-size:1.6rem}#auth .wm{font-size:2.2rem}.gh{top:16px;left:16px;right:16px}}
+@media(min-width:901px){#f{align-self:start;position:sticky;top:16px}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head><body>
+
+<div id="bar" hidden><span class="wm">Mathmax</span><button type="button" id="who" title="Edit name"></button><span class="m" id="sy"></span><button type="button" id="so">Sign out</button></div>
+
+<div id="auth" hidden></div>
+
+<div id="home" class="app" hidden>
+<form id="f"><div class="hd"><h1>Drill</h1><span class="m">Pick operations, set the clock.</span></div><div class="grid" id="ops"></div></form>
+<aside class="right">
+<h2 title="Every drill you have played, including ones with unsaved settings">Lifetime</h2><div class="lt" id="sum"></div><button type="button" id="wk" hidden>Drill my slowest operations</button>
+<h2>Stacks <span class="m">(saved presets)</span></h2>
+<div class="save"><input type="text" class="w" id="pn" placeholder="Stack name"><button type="button" id="ps">Save stack</button></div><button type="button" id="pu" hidden></button>
+<p class="m" id="pm"></p><div id="pl"></div><p class="m" id="rf"><a href="#" id="exp">Export data</a><a href="#" id="rst">Reset account data</a></p></aside></div>
+
+<div id="ins" class="pg" hidden>
+<div class="ih"><button type="button" id="bk2">Back</button><h1 id="it"></h1><button type="button" class="pri" id="ip">Mathmaxxing</button><button type="button" id="il">Load settings</button><button type="button" id="idl">Delete stack</button></div>
+<div id="ib"></div></div>
+
+<div id="game" hidden><div class="gm">
+<div class="gh"><span id="lf"></span><span id="gs"></span></div>
+<div id="pa"><div id="pr"></div><input id="an" autocomplete="off" inputmode="decimal" aria-label="Answer"></div>
+<div id="end" hidden><p id="es"></p><p class="sm" id="ex"></p><p class="sm" id="pbl"></p><p class="sm" id="rv"></p><p class="sm"><a href="#" id="ta">Run it back</a> or <a href="#" id="cs">change the setup</a>.</p></div></div>
+<button type="button" id="eh">Quit (Esc)</button><div id="lv" class="sr" aria-live="polite"></div></div>
+
+<dialog id="dlg"><div class="di"><div class="dh"><h2>All stacks</h2><button type="button" id="dx">Close</button></div><div id="al"></div></div></dialog>
+<dialog id="rdlg"><div class="di"><h2>Reset account data</h2>
+<p class="m">This permanently deletes every drill, stack and stat, on this device and in your account. Your sign-in and name stay. It cannot be undone.</p>
+<p class="m">Type <b>delete</b> to confirm.</p><input type="text" id="rc" class="fld" autocomplete="off" aria-label="Type delete to confirm">
+<div class="bt"><button type="button" id="rn">Cancel</button><button type="button" id="ry" class="dng" disabled>Delete everything</button></div></div></dialog>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),K='zt3';
+const SB_URL='https://ijlnuowgnqhdlpgdiwwj.supabase.co',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbG51b3dnbnFoZGxwZ2Rpd3dqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2MjUxMTQsImV4cCI6MjEwNzIwMTExNH0.RluMeHP-HPmy9bevT5mXMNFMkDZFPYz02eFs8l8Y0M4';
+const OPK=['add','sub','mul','div','tab','sq','cu','pw','fr','py','rt'];
+const OPL=['Addition','Subtraction','Multiplication','Division','Tables','Squares','Cubes','Powers','Fractions','Triplets','Square roots'];
+const DEF={add:1,sub:1,mul:1,div:1,add_left_min:2,add_left_max:100,add_right_min:2,add_right_max:100,sub_left_min:2,sub_left_max:200,sub_right_min:2,sub_right_max:100,mul_left_min:2,mul_left_max:12,mul_right_min:2,mul_right_max:100,div_left_min:2,div_left_max:12,div_right_min:2,div_right_max:100,tab:0,tab_min:2,tab_max:25,sq:0,sq_min:2,sq_max:40,cu:0,cu_min:2,cu_max:21,pw:0,fr:0,py:0,rt:0,d:'120'};
+const NK=Object.keys(DEF).filter(k=>/_(min|max)$/.test(k)),PR=['add_left','add_right','sub_left','sub_right','mul_left','mul_right','div_left','div_right','tab','sq','cu'];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=x=>{if(x==null||!isFinite(x))return'-';if(x<59.95)return x.toFixed(1)+'s';const r=Math.round(x);return Math.floor(r/60)+'m '+String(r%60).padStart(2,'0')+'s'};
+const pc=x=>x==null?'-':Math.round(x*100)+'%';
+const inp=id=>`<input type="text" inputmode="numeric" id="${id}" value="${DEF[id]}">`;
+const r2=(a,b)=>`${inp(a)}<i>\u2013</i>${inp(b)}`;
+const TL=[
+['add','Addition',`${r2('add_left_min','add_left_max')}<i>+</i>${r2('add_right_min','add_right_max')}`,2,''],
+['sub','Subtraction',`${r2('sub_left_min','sub_left_max')}<i>\u2212</i>${r2('sub_right_min','sub_right_max')}`,2,'First minus second. If the second is bigger, they swap.'],
+['mul','Multiplication',`${r2('mul_left_min','mul_left_max')}<i>\u00d7</i>${r2('mul_right_min','mul_right_max')}`,2,''],
+['div','Division',`<i>n \u00f7</i>${r2('div_left_min','div_left_max')}<i>=</i>${r2('div_right_min','div_right_max')}`,2,'Divisor range, then answer range'],
+['tab','Tables',r2('tab_min','tab_max'),2,'Up to \u00d710. Tables 26\u201330 go up to \u00d75, 31\u201340 up to \u00d73.'],
+['sq','Squares',r2('sq_min','sq_max'),1,''],
+['cu','Cubes',r2('cu_min','cu_max'),1,''],
+['pw','Powers','bases 2 to 6',1,'2 up to 12, 3, 4 and 5 up to 6, 6 up to 4'],
+['fr','Fractions','1/n and %',1,'1/n to % and back, n from 2 to 20, two decimals'],
+['py','Triplets','missing side',1,'Find the missing side of a Pythagorean triplet'],
+['rt','Square roots','\u221a2, \u221a3, \u221a5\u2026',1,'\u221a2, \u221a3, \u221a5 and their multiples, two decimals']];
+$('ops').innerHTML=TL.map(r=>`<label class="t${r[3]===2?' s2':''}" title="${r[4]}"><input type="checkbox" class="ck" id="${r[0]}"${DEF[r[0]]?' checked':''}><b>${r[1]}</b><span class="sb">${r[2]}</span></label>`).join('')
+ +'<label class="t s2"><b>Duration</b><span class="sb"><select id="d"><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="120" selected>120 seconds</option><option value="300">300 seconds</option><option value="600">600 seconds</option><option value="q25">25 questions</option><option value="q50">50 questions</option><option value="q100">100 questions</option></select></span></label>'
+ +'<input type="submit" class="go" value="Lock in">';
+
+/* ---- local storage: two copies (localStorage + IndexedDB), newest wins ---- */
+const fresh=()=>({v:2,rev:0,presets:[],sessions:[],gone:{},dels:[]});
+const agg=r=>{if(r.o)return r.o;const o=OPK.map(()=>[0,0]);(r.qs||[]).forEach(x=>{o[x[0]][0]++;o[x[0]][1]+=x[1]});return o};
+const trim=()=>S.sessions.forEach(r=>{if(r.qs){r.o=agg(r);delete r.qs}delete r.s});
+let S=fresh(),user=null,pt=0,view='load',rec=0,amode='in',rmail='';
+const idb=()=>new Promise((r,j)=>{const q=indexedDB.open('zt3',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});
+const idbGet=()=>idb().then(db=>new Promise((r,j)=>{const q=db.transaction('kv').objectStore('kv').get(K);q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)}));
+const idbPut=v=>idb().then(db=>new Promise((r,j)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,K);t.oncomplete=r;t.onerror=()=>j(t.error)}));
+function save(ns){trim();S.rev++;const j=JSON.stringify(S);try{localStorage.setItem(K,j)}catch(e){}idbPut(JSON.parse(j)).catch(()=>{});
+ if(user&&!ns){clearTimeout(pt);pt=setTimeout(()=>trySync(),1500)}}
+async function boot(){let a=null,b=null;
+ try{a=JSON.parse(localStorage.getItem(K))}catch(e){}
+ try{b=await idbGet()}catch(e){}
+ let best=[a,b].filter(x=>x&&Array.isArray(x.sessions)).sort((x,y)=>(y.rev||0)-(x.rev||0))[0],imp=0;
+ if(!best){try{const o=JSON.parse(localStorage.getItem('zt2'));if(o&&Array.isArray(o.sessions)){best=o;imp=1}}catch(e){}}
+ if(best){S=Object.assign(S,best);S.gone=gm(S.gone);if(imp||!a||!b||a.rev!==b.rev)save(true)}
+ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+ draw()}
+
+/* ---- cloud sync + accounts (Supabase) ---- */
+let sb=null;try{sb=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null}catch(e){}
+const smsg=(t,bad)=>{$('sy').textContent=t;$('sy').classList.toggle('bad',!!bad)},amsg=t=>{const e=$('am');if(e)e.textContent=t};
+const gm=g=>Array.isArray(g)?Object.fromEntries(g.map(n=>[n,0])):(g||{});
+const dead=p=>S.gone[p.name]!==undefined&&S.gone[p.name]>=(p.c||0);
+function merge(d){if(!d)return;const dr=d.reset||0,lr=S.reset||0;if(dr>lr){S.sessions=[];S.presets=[];S.gone={};S.dels=[];S.reset=dr}else if(dr<lr)return;S.dels=[...new Set([...(S.dels||[]),...(d.dels||[])])];const dl=new Set(S.dels);const ids=new Set(S.sessions.map(r=>r.id));
+ (d.sessions||[]).forEach(r=>{if(!ids.has(r.id)){S.sessions.push(r);ids.add(r.id)}});S.sessions=S.sessions.filter(r=>!dl.has(r.id));S.sessions.sort((x,y)=>x.t-y.t);
+ const g=gm(d.gone);S.gone=gm(S.gone);Object.keys(g).forEach(n=>{S.gone[n]=Math.max(S.gone[n]??-1,g[n])});
+ (d.presets||[]).forEach(p=>{const i=S.presets.findIndex(x=>x.name===p.name);if(i<0)S.presets.push(p);else if((p.c||0)>(S.presets[i].c||0))S.presets[i]=p});
+ S.presets=S.presets.filter(p=>!dead(p))}
+let rt=0;const trySync=()=>sync().catch(e=>{smsg('Not synced. Retrying\u2026',1);clearTimeout(rt);rt=setTimeout(trySync,30000)});
+addEventListener('online',()=>trySync());
+async function sync(){if(!sb||!user)return;smsg('Syncing…');
+ const{data,error}=await sb.from('progress').select('data').maybeSingle();if(error)throw error;
+ merge(data&&data.data);save(true);
+ const r=await sb.from('progress').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()});if(r.error)throw r.error;
+ draw();smsg('Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}))}
+
+function auth(mode,msg){const e=$('em');if(e&&e.value)rmail=e.value.trim();amode=mode;
+ const T={in:['Welcome back','Sign in to pick up where you left off.'],up:['Create your account','One account keeps your progress on every device.'],fg:['Reset your password','Enter your email and we will send you a 6-digit code.'],rs:['Check your email','Enter the code we sent to '+esc(rmail)+' and choose a new password.']}[mode];
+ const em=`<input class="fld" type="email" id="em" placeholder="Email" autocomplete="email" required value="${esc(rmail)}">`;
+ const body={in:em+'<input class="fld" type="password" id="apw" placeholder="Password" autocomplete="current-password" required>',
+  up:'<input class="fld" type="text" id="nm" placeholder="Name" autocomplete="name" maxlength="40">'+em+'<input class="fld" type="password" id="apw" placeholder="Password (6+ characters)" autocomplete="new-password" required minlength="6">',
+  fg:em,
+  rs:'<input class="fld" type="text" id="cd" placeholder="6-digit code" inputmode="numeric" autocomplete="one-time-code" required style="text-align:left"><input class="fld" type="password" id="apw" placeholder="New password (6+ characters)" autocomplete="new-password" required minlength="6">'}[mode];
+ const btn={in:'Sign in',up:'Create account',fg:'Send code',rs:'Reset password'}[mode];
+ const lk={in:'<a href="#" data-m="fg">Forgot password?</a><a href="#" data-m="up">Create an account</a>',up:'<a href="#" data-m="in">I already have an account</a>',fg:'<a href="#" data-m="in">Back to sign in</a>',rs:'<a href="#" data-m="fg">Send a new code</a><a href="#" data-m="in">Back to sign in</a>'}[mode];
+ $('auth').innerHTML=`<span class="wm">Mathmax</span><h1>${T[0]}</h1><p class="m">${T[1]}</p><form id="af">${body}<button class="pri fld" type="submit">${btn}</button></form><p class="lk">${lk}</p><p class="m" id="am">${esc(msg||'')}</p>`}
+$('auth').onclick=e=>{const m=e.target.dataset.m;if(m){e.preventDefault();auth(m)}};
+$('auth').onsubmit=async e=>{e.preventDefault();const g=id=>$(id)?$(id).value.trim():'',mode=amode;
+ try{amsg('Working…');
+  if(mode==='in'){rmail=g('em');const{error}=await sb.auth.signInWithPassword({email:rmail,password:$('apw').value});if(error)throw error}
+  else if(mode==='up'){rmail=g('em');const{data,error}=await sb.auth.signUp({email:rmail,password:$('apw').value,options:{data:g('nm')?{name:g('nm')}:{}}});if(error)throw error;if(!data.session)auth('in','Account created. Confirm the email we sent you, then sign in.')}
+  else if(mode==='fg'){rmail=g('em');const{error}=await sb.auth.resetPasswordForEmail(rmail);if(error)throw error;auth('rs','Code sent. It can take a minute to arrive.')}
+  else{rec=1;const{error}=await sb.auth.verifyOtp({email:rmail,token:g('cd'),type:'recovery'});if(error)throw error;
+   const r=await sb.auth.updateUser({password:$('apw').value});if(r.error)throw r.error;rec=0;show('home')}
+ }catch(err){rec=0;if(user&&mode==='rs'){show('home');alert('You are signed in, but the password was not changed: '+err.message)}else amsg(err.message)}};
+$('so').onclick=async()=>{if(!sb||!confirm('Signing out clears your progress from this browser. It stays safe in your account.'))return;
+ try{clearTimeout(pt);await sync();await sb.auth.signOut();S=Object.assign(fresh(),{rev:S.rev});save(true)}
+ catch(err){alert('Could not sync before signing out, so you are still signed in. '+err.message)}};
+if(sb)sb.auth.onAuthStateChange((ev,sess)=>{user=sess?sess.user:null;$('who').textContent=user?((user.user_metadata&&user.user_metadata.name)||user.email.split('@')[0]):'';
+ if(user){if(S.owner&&S.owner!==user.id)S=Object.assign(fresh(),{rev:S.rev});S.owner=user.id;if((view==='auth'||view==='load')&&!rec)show('home');setTimeout(()=>trySync(),0)}
+ else{auth('in');show('auth')}});
+
+/* ---- settings ---- */
+function rd(){const s={d:$('d').value};OPK.forEach(k=>{s[k]=$(k).checked?1:0});
+ if(!OPK.some(k=>s[k]))s.add=1;
+ NK.forEach(k=>{const v=parseInt($(k).value,10),lo=/^div_left/.test(k)?1:0;s[k]=isNaN(v)?DEF[k]:Math.min(1e5,Math.max(lo,v))});
+ PR.forEach(p=>{if(s[p+'_min']>s[p+'_max']){const t=s[p+'_min'];s[p+'_min']=s[p+'_max'];s[p+'_max']=t}});
+ return s}
+function wr(s){s=Object.assign({},DEF,s);OPK.forEach(k=>{$(k).checked=!!s[k]});NK.forEach(k=>{$(k).value=s[k]});$('d').value=s.d;if($('d').value!==s.d)$('d').value=DEF.d}
+const sig=s=>JSON.stringify(Object.keys(DEF).map(k=>s&&s[k]!==undefined?s[k]:DEF[k]));
+const match=s=>(S.presets.find(p=>sig(p.s)===sig(s))||{}).name||null;
+const desc=s=>{s=Object.assign({},DEF,s);const r=(a,b)=>`${s[a]}\u2013${s[b]}`;
+ return[s.add&&`Addition (${r('add_left_min','add_left_max')} + ${r('add_right_min','add_right_max')})`,s.sub&&`Subtraction (${r('sub_left_min','sub_left_max')} \u2212 ${r('sub_right_min','sub_right_max')})`,s.mul&&`Multiplication (${r('mul_left_min','mul_left_max')} \u00d7 ${r('mul_right_min','mul_right_max')})`,s.div&&`Division (\u00f7 ${r('div_left_min','div_left_max')}, answers ${r('div_right_min','div_right_max')})`,s.tab&&`Tables (${r('tab_min','tab_max')})`,s.sq&&`Squares (${r('sq_min','sq_max')})`,s.cu&&`Cubes (${r('cu_min','cu_max')})`,s.pw&&'Powers',s.fr&&'Fractions',s.py&&'Triplets',s.rt&&'Square roots'].filter(Boolean).join(', ')+'. '+(/^q/.test(s.d)?s.d.slice(1)+' questions.':s.d+' seconds.')};
+
+/* ---- question generator: plain Math.random, nothing adaptive ----
+   1. pick one enabled operation, equal odds
+   2. pick each operand uniformly inside its own range
+   3. sub: if the second number is bigger, swap, so answers are never negative
+   4. div: pick divisor and answer, show their product, so it always divides evenly
+   5. tables: multiplier is 1-10 (1-5 above table 25, 1-3 above table 30) */
+const rn=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const sup=(b,e)=>`${b}<sup>${e}</sup>`;
+const PW=[[2,12],[3,6],[4,6],[5,6],[6,4]];
+const TR=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29],[12,35,37],[9,40,41],[6,8,10],[9,12,15],[12,16,20],[15,20,25],[10,24,26],[15,36,39]];
+const RT=[2,3,5,8,12,18,20,45,50];
+const hash=x=>{let h=0;for(let i=0;i<x.length;i++)h=(h*31+x.charCodeAt(i))|0;return(h>>>0).toString(36)};
+const SUP='\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079';
+const qtext=c=>c.l!==undefined?`${c.u} ${c.o} ${c.l}`:c.t.replace(/<sup>(\d+)<\/sup>/g,(m,d)=>[...d].map(x=>SUP[x]).join(''));
+const plain=c=>{const t=qtext(c);return t+(t.includes('?')?' \u2192 ':' = ')+c.a};
+function np(s){const o=[];OPK.forEach((k,i)=>{if(s[k])o.push(i)});const op=o[rn(0,o.length-1)];let a,b,x;
+ if(op===0){a=rn(s.add_left_min,s.add_left_max);b=rn(s.add_right_min,s.add_right_max);return{op,t:`${a} + ${b}`,u:a,l:b,o:'+',a:a+b}}
+ if(op===1){a=rn(s.sub_left_min,s.sub_left_max);b=rn(s.sub_right_min,s.sub_right_max);if(b>a){x=a;a=b;b=x}return{op,t:`${a} \u2212 ${b}`,u:a,l:b,o:'\u2212',a:a-b}}
+ if(op===2){a=rn(s.mul_left_min,s.mul_left_max);b=rn(s.mul_right_min,s.mul_right_max);return{op,t:`${a} \u00d7 ${b}`,u:a,l:b,o:'\u00d7',a:a*b}}
+ if(op===3){a=rn(s.div_left_min,s.div_left_max);b=rn(s.div_right_min,s.div_right_max);return{op,t:`${a*b} \u00f7 ${a}`,u:a*b,l:a,o:'\u00f7',a:b}}
+ if(op===4){a=rn(s.tab_min,s.tab_max);b=rn(1,a>30?3:a>25?5:10);return{op,t:`${a} \u00d7 ${b}`,u:a,l:b,o:'\u00d7',a:a*b}}
+ if(op===5){a=rn(s.sq_min,s.sq_max);return{op,t:sup(a,2),a:a*a}}
+ if(op===6){a=rn(s.cu_min,s.cu_max);return{op,t:sup(a,3),a:a*a*a}}
+ if(op===7){x=PW[rn(0,PW.length-1)];a=x[0];b=rn(2,x[1]);return{op,t:sup(a,b),a:Math.pow(a,b)}}
+ if(op===8){a=rn(2,20);b=Math.round(1e4/a)/100;return rn(0,1)?{op,t:`1/${a} = ?%`,a:b}:{op,t:`${b}% = 1/?`,a}}
+ if(op===9){x=TR[rn(0,TR.length-1)];return rn(0,1)?{op,t:`\u221a(${sup(x[0],2)} + ${sup(x[1],2)})`,a:x[2]}:{op,t:`\u221a(${sup(x[2],2)} \u2212 ${sup(x[0],2)})`,a:x[1]}}
+ a=RT[rn(0,RT.length-1)];return{op,t:`\u221a${a}`,a:Math.round(Math.sqrt(a)*100)/100}}
+
+/* ---- the drill ---- */
+let G=null,cur=-1;const an=$('an');
+function show(id){view=id;['auth','home','game','ins'].forEach(x=>{$(x).hidden=x!==id});
+ $('bar').hidden=!(id==='home'||id==='ins');$('so').hidden=!sb;if(id==='auth'&&!$('auth').innerHTML)auth('in');if(id==='home')draw()}
+function nx(first){const c=G.cur=np(G.s);$('pr').innerHTML=c.l!==undefined?`<div class="r">${c.u}</div><div class="r"><span class="o">${c.o}</span>${c.l}</div>`:`<div class="r">${c.t}</div>`;$('lv').textContent=qtext(c);an.value='';if(!first)G.qt=Date.now()}
+function start(s){if(G){clearInterval(G.tm);clearInterval(G.cdt)}const q=/^q/.test(s.d);
+ G={s,q,n:parseInt(String(s.d).replace('q',''),10),sc:0,mi:0,go:0,over:0,tm:0,cdt:0,qs:[],wr:[],cur:null,t0:0,qt:0};
+ show('game');$('game').classList.toggle('q',q);$('pa').hidden=false;$('end').hidden=true;an.disabled=false;an.value='';
+ $('lf').textContent=q?'Questions left: '+G.n:G.n+'s';$('gs').textContent=q?'0s':'Score: 0';
+ let c=3;$('pr').innerHTML='<div class="r">3</div>';an.focus();
+ G.cdt=setInterval(()=>{c--;if(c>0){$('pr').innerHTML='<div class="r">'+c+'</div>';return}
+  clearInterval(G.cdt);G.go=1;nx(true);G.t0=G.qt=Date.now();G.tm=setInterval(tick,100);an.focus()},800)}
+an.oninput=()=>{if(!G||G.over)return;if(!G.go){an.value='';return}const now=Date.now();
+ const v=an.value.trim().replace(',','.'),a=G.cur.a;
+ if(/^\d*\.?\d+$/.test(v)&&+v===a){G.sc++;G.qs.push([G.cur.op,Math.round((now-G.qt)/100)]);
+  if(G.q){$('lf').textContent='Questions left: '+(G.n-G.sc);if(G.sc>=G.n){end();return}}else $('gs').textContent='Score: '+G.sc;
+  nx()}
+ else if(v.length>=String(a).length){G.mi++;if(!G.cur.w){G.cur.w=1;G.wr.push(plain(G.cur))}an.value='';const pa=$('pa');pa.classList.add('bad');setTimeout(()=>pa.classList.remove('bad'),250)}};
+function tick(){const e=(Date.now()-G.t0)/1000;
+ if(G.q){$('gs').textContent=Math.floor(e)+'s'}
+ else{const l=G.n-e;$('lf').textContent=Math.max(0,Math.ceil(l))+'s';if(l<=0)end()}}
+function end(){clearInterval(G.tm);G.over=1;an.disabled=true;
+ const el=G.q?(Date.now()-G.t0)/1000:G.n,er=Math.round(el*10)/10,tot=G.sc+G.mi,k=hash(sig(G.s)),m=G.q?'q':'t';
+ const pr=S.sessions.filter(r=>r.k===k&&r.m===m);let pbt='First drill with these settings.';
+ if(pr.length){const b=G.q?Math.min(...pr.map(r=>r.el)):Math.max(...pr.map(r=>r.sc));pbt=(G.q?er<b:G.sc>b)?'New personal best.':'Personal best: '+(G.q?fmt(b):b)}
+ S.sessions.push({id:G.t0,t:Date.now(),p:match(G.s),k,m,d:G.n,sc:G.sc,mi:G.mi,el:er,o:agg({qs:G.qs})});save();
+ if(!G.q)$('lf').textContent='0s';
+ $('pa').hidden=true;$('end').hidden=false;
+ $('es').textContent=G.q?'Time: '+fmt(el):'Score: '+G.sc;
+ const tq=G.qs.length?G.qs.reduce((a,x)=>a+x[1],0)/G.qs.length/10:null,w=G.wr;
+ $('ex').textContent='Average per question '+fmt(tq)+', accuracy '+(tot?pc(G.sc/tot):'-');
+ $('pbl').textContent=pbt;
+ $('rv').innerHTML=w.length?'<span class="m">Missed</span><br>'+w.slice(0,6).map(esc).join('<br>')+(w.length>6?'<br>and '+(w.length-6)+' more':''):''}
+$('ta').onclick=e=>{e.preventDefault();start(G.s)};
+$('cs').onclick=e=>{e.preventDefault();show('home')};
+$('f').onsubmit=e=>{e.preventDefault();const s=rd();wr(s);start(s)};
+let qa=0;
+function quit(){const g=G;if(g&&g.go&&!g.over&&Date.now()-qa>2500){qa=Date.now();$('eh').textContent='Press again to quit';setTimeout(()=>{$('eh').textContent='Quit (Esc)'},2500);an.focus();return}
+ if(g){clearInterval(g.tm);clearInterval(g.cdt);g.over=1}$('eh').textContent='Quit (Esc)';show('home')}
+$('eh').onclick=quit;
+$('game').onclick=e=>{if(G&&!G.over&&e.target.id!=='eh')an.focus()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&view==='game')quit()});
+
+/* ---- stats ---- */
+function stats(L){if(!L.length)return null;let q=0,qt=0,sc=0,mi=0,el=0;const o=OPK.map(()=>[0,0]);
+ L.forEach(r=>{sc+=r.sc;mi+=r.mi;el+=r.el;agg(r).forEach((x,i)=>{q+=x[0];qt+=x[1];o[i][0]+=x[0];o[i][1]+=x[1]})});
+ return{n:L.length,q,acc:sc+mi?sc/(sc+mi):null,comp:el/L.length,tpq:q?qt/q/10:null,o:o.map(x=>x[0]?x[1]/x[0]/10:null),oc:o.map(x=>x[0])}}
+const sq=r=>{let n=0,t=0;agg(r).forEach(x=>{n+=x[0];t+=x[1]});return n?t/n/10:null};
+const kt=a=>a.map(x=>`<div class="k"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+const mini=a=>'<div class="mn">'+a.map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join('')+'</div>';
+const row4=st=>[['Drills',st?st.n:0],['Average completion',st?fmt(st.comp):'-'],['Average per question',st?fmt(st.tpq):'-'],['Accuracy',st?pc(st.acc):'-']];
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const dn=t=>{const d=new Date(t);return Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5)};
+function streak(L){const h=new Set(L.map(r=>dn(r.t)));let d=dn(Date.now()),n=0;if(!h.has(d))d--;while(h.has(d)){n++;d--}return n}
+const life=L=>{const st=stats(L);return[['Drills',st?st.n:0],['Day streak',streak(L)],['Average completion',st?fmt(st.comp):'-'],['Average per question',st?fmt(st.tpq):'-'],['Accuracy',st?pc(st.acc):'-'],['Questions solved',st?st.q:0]]};
+let WK=[],ld=null;
+
+/* ---- home screen ---- */
+const pm=t=>{$('pm').textContent=t};
+const card=(p,i)=>{const st=stats(S.sessions.filter(r=>r.p===p.name));
+ return`<div class="pb"><a href="#" class="nm" data-a="ins" data-i="${i}">${esc(p.name)}</a><div class="ds">${esc(desc(p.s))}</div>${mini(row4(st))}<div class="bt"><button type="button" class="pri" data-a="prac" data-i="${i}">Mathmaxxing</button><button type="button" data-a="load" data-i="${i}">Load</button><button type="button" data-a="ins" data-i="${i}">Breakdown</button></div></div>`};
+const used=p=>S.sessions.reduce((m,r)=>r.p===p.name&&r.t>m?r.t:m,p.c||0);
+function draw(){const o=S.presets.map((p,i)=>i).sort((a,b)=>used(S.presets[b])-used(S.presets[a]));
+ $('pl').innerHTML=o.length?card(S.presets[o[0]],o[0])+(o.length>1?`<button type="button" class="more" id="sa">Show all ${o.length} stacks</button>`:''):'<p class="m">No stacks yet. Pick your operations, name them and save.</p>';
+ $('al').innerHTML=o.map(i=>card(S.presets[i],i)).join('');
+ const st=stats(S.sessions);
+ WK=st?st.o.map((x,i)=>[x,i]).filter(x=>x[0]!=null&&st.oc[x[1]]>=5).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]):[];$('wk').hidden=WK.length<2;
+ $('sum').innerHTML=kt(life(S.sessions))}
+$('wk').onclick=()=>{if(WK.length<2)return;const s=rd();OPK.forEach(k=>{s[k]=0});WK.forEach(i=>{s[OPK[i]]=1});start(s)};
+$('ps').onclick=()=>{const n=$('pn').value.trim();if(!n){pm('Give the stack a name first.');return}
+ if(S.presets.some(p=>p.name===n)){pm('A stack named "'+n+'" already exists. Pick another name.');return}
+ const s=rd(),m=match(s);if(m){pm('These settings are already saved as "'+m+'".');return}
+ S.presets.push({name:n,s,c:Date.now()});save();$('pn').value='';pm('Stack "'+n+'" saved.');ld=n;upd();draw()};
+function upd(){const p=S.presets.find(x=>x.name===ld);$('pu').hidden=!(p&&sig(p.s)!==sig(rd()));if(p)$('pu').textContent='Update "'+p.name+'" with these settings'}
+$('f').addEventListener('input',upd);$('f').addEventListener('change',upd);
+$('pu').onclick=()=>{const p=S.presets.find(x=>x.name===ld);if(!p)return;const s=rd(),m=match(s);if(m&&m!==p.name){pm('These settings are already saved as "'+m+'".');return}
+ p.s=s;p.c=Date.now();save();pm('Stack "'+p.name+'" updated.');upd();draw()};
+function act(a,i){const p=S.presets[i];if(!p)return;
+ if(a==='ins'){cur=i;ins()}
+ else if(a==='load'){wr(p.s);ld=p.name;upd();pm('Loaded "'+p.name+'". Hit Lock in to run it.')}
+ else if(a==='prac'){wr(p.s);ld=p.name;upd();start(Object.assign({},DEF,p.s))}}
+const clk=e=>{const t=e.target;if(t.id==='sa'){$('dlg').showModal();return}if(t.dataset.i==null)return;e.preventDefault();if($('dlg').open)$('dlg').close();act(t.dataset.a,+t.dataset.i)};
+$('pl').onclick=clk;$('al').onclick=clk;
+$('dx').onclick=()=>$('dlg').close();
+$('dlg').onclick=e=>{if(e.target===$('dlg'))$('dlg').close()};
+
+$('exp').onclick=e=>{e.preventDefault();const b=new Blob([JSON.stringify({exported:new Date().toISOString(),stacks:S.presets,drills:S.sessions},null,1)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mathmax-data.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+/* ---- reset account data ---- */
+$('rst').onclick=e=>{e.preventDefault();$('rc').value='';$('ry').disabled=true;$('rdlg').showModal();$('rc').focus()};
+$('rc').oninput=()=>{$('ry').disabled=$('rc').value.trim().toLowerCase()!=='delete'};
+$('rn').onclick=()=>$('rdlg').close();
+$('ry').onclick=async()=>{$('rdlg').close();clearTimeout(pt);
+ S=Object.assign(fresh(),{rev:S.rev,owner:S.owner,reset:Date.now()});save(true);pm('');draw();
+ try{if(user)await sync()}catch(err){alert('Data was reset on this device, but the cloud copy could not be updated yet: '+err.message)}};
+
+/* ---- stack breakdown ---- */
+function spark(v){const W=640,H=120,mn=Math.min(...v),r=(Math.max(...v)-mn)||1;
+ const P=v.map((y,i)=>[10+i*(W-20)/(v.length-1),10+(H-34)*(1-(y-mn)/r)]);
+ return`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px"><polyline fill="none" stroke="#8ecbff" stroke-width="2" points="${P.map(x=>x.join(',')).join(' ')}"/>${P.map(x=>`<circle cx="${x[0]}" cy="${x[1]}" r="3" fill="#8ecbff"/>`).join('')}<text x="10" y="${H-6}" font-size="11" fill="#7f8b96">first drill</text><text x="${W-10}" y="${H-6}" font-size="11" text-anchor="end" fill="#7f8b96">latest, lower line is faster</text></svg>`}
+function ins(){const p=S.presets[cur];if(!p){show('home');return}
+ const L=S.sessions.filter(r=>r.p===p.name),a=stats(L);$('it').textContent=p.name;show('ins');
+ let h=`<p class="m" style="margin:0 0 12px">${esc(desc(p.s))}</p>`;
+ if(!a){$('ib').innerHTML=h+'<div class="pn">No drills yet. Hit Mathmaxxing to record your first one.</div>';return}
+ const tq=L.map(sq).filter(x=>x!=null),qm=L[0].m==='q';
+ h+='<div class="s6">'+kt([['Drills',a.n],['Average completion',fmt(a.comp)],['Average per question',fmt(a.tpq)],['Accuracy',pc(a.acc)],
+  [qm?'Fastest finish':'Best score',qm?fmt(Math.min(...L.map(r=>r.el))):Math.max(...L.map(r=>r.sc))],['Fastest drill',tq.length?fmt(Math.min(...tq))+' per question':'-']])+'</div>';
+ let c='<p class="m">Play at least two drills to see your trend.</p>';
+ if(tq.length>1){c=spark(tq);
+  if(tq.length>=4){const k=Math.min(5,Math.floor(tq.length/2)),rc=avg(tq.slice(-k)),pv=avg(tq.slice(-2*k,-k)),d=(pv-rc)/pv*100;
+   c+=`<p>Your last ${k} drills are <b>${Math.abs(d).toFixed(0)}% ${d>=0?'faster':'slower'}</b> per question than the ${k} before.</p>`}}
+ const ov=a.o.filter(x=>x!=null);let o='<p class="m">No data yet.</p>';
+ if(ov.length){const mx=Math.max(...ov);o='<div class="bo">'+a.o.map((x,i)=>x==null?'':`<p class="br"><span class="ol">${OPL[i]}</span><span class="bar" style="width:${Math.max(4,x/mx*110)}px"></span>${fmt(x)} <span class="m">(${a.oc[i]})</span></p>`).join('')+'</div>';
+  if(ov.length>1)o+=`<p class="m">Weak point: ${OPL[a.o.indexOf(mx)].toLowerCase()}. Max it out.</p>`}
+ h+=`<div class="two"><div class="pn"><h2>Speed over time</h2>${c}</div><div class="pn"><h2>By operation</h2>${o}</div></div>`;
+ h+='<div class="pn" style="margin-top:10px"><h2>Recent drills</h2><table><tr><th>Date</th><th>Score</th><th>Time</th><th>Accuracy</th><th>Per question</th><th></th></tr>'+L.slice(-10).reverse().map(r=>`<tr><td>${new Date(r.t).toLocaleString([],{dateStyle:'short',timeStyle:'short'})}</td><td>${r.sc}</td><td>${fmt(r.el)}</td><td>${r.sc+r.mi?pc(r.sc/(r.sc+r.mi)):'-'}</td><td>${fmt(sq(r))}</td><td><button type="button" class="x" data-del="${r.id}">Delete</button></td></tr>`).join('')+'</table></div>';
+ $('ib').innerHTML=h}
+$('ib').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;const id=+b.dataset.del;
+ if(!confirm('Delete this drill from your history?'))return;S.dels.push(id);S.sessions=S.sessions.filter(r=>r.id!==id);save();ins()};
+$('bk2').onclick=e=>{e.preventDefault();show('home')};
+$('ip').onclick=()=>act('prac',cur);
+$('il').onclick=()=>{act('load',cur);show('home')};
+$('idl').onclick=()=>{const p=S.presets[cur];if(p&&confirm('Delete stack "'+p.name+'"? Your drill history is kept.')){S.gone[p.name]=Date.now();S.presets.splice(cur,1);save();show('home')}};
+
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+boot();
+$('who').onclick=async()=>{if(!sb||!user)return;const cur=(user.user_metadata&&user.user_metadata.name)||'';
+ const n=prompt('Your name',cur);if(n===null)return;
+ const r=await sb.auth.updateUser({data:{name:n.trim().slice(0,40)}});if(r.error){alert(r.error.message);return}
+ user=r.data.user;$('who').textContent=(user.user_metadata&&user.user_metadata.name)||user.email.split('@')[0]};
+if(!sb){$('who').textContent='Offline mode';$('who').disabled=true;show('home')}
+else setTimeout(()=>{if(view==='load'){if(user)show('home');else{auth('in');show('auth')}}},3000);
+})();
+</script></body></html>
