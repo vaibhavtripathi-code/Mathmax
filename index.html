@@ -289,7 +289,19 @@ $('auth').onclick=e=>{const m=e.target.dataset.m;if(m){e.preventDefault();auth(m
 $('auth').onsubmit=async e=>{e.preventDefault();const g=id=>$(id)?$(id).value.trim():'',mode=amode;
  try{amsg('Working…');
   if(mode==='in'){rmail=g('em');const{error}=await sb.auth.signInWithPassword({email:rmail,password:$('apw').value});if(error)throw error}
-  else if(mode==='up'){rmail=g('em');const{data,error}=await sb.auth.signUp({email:rmail,password:$('apw').value,options:{data:g('nm')?{name:g('nm')}:{}}});if(error)throw error;if(!data.session)auth('in','Account created! Check your inbox for the verification link, then sign in.')}
+  else if(mode==='up'){
+  rmail=g('em');
+  const{data,error}=await sb.auth.signUp({
+    email: rmail,
+    password: $('apw').value,
+    options: {
+      emailRedirectTo: window.location.origin,
+      data: g('nm') ? { name: g('nm') } : {}
+    }
+  });
+  if(error) throw error;
+  if(!data.session) auth('in','Account created! Check your email for the verification link, then sign in.');
+}
   else if(mode==='fg'){rmail=g('em');const{error}=await sb.auth.resetPasswordForEmail(rmail);if(error)throw error;auth('rs','Code sent. It can take a minute to arrive.')}
   else{rec=1;const{error}=await sb.auth.verifyOtp({email:rmail,token:g('cd'),type:'recovery'});if(error)throw error;
    const r=await sb.auth.updateUser({password:$('apw').value});if(r.error)throw r.error;rec=0;show('home')}
